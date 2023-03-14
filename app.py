@@ -73,12 +73,14 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
 
     tens = [roll_helper(10) for _ in range(bonus + penalty + 1)]
     response += "Tens: {}\n".format(tens[0] if len(tens) == 1 else tens)
+    ones_result = roll_helper(10)
+    if ones_result == 0:
+        tens = map(lambda x: 10 if x == 0 else x, tens)
     tens_result = min(tens) if bonus > 0 else max(tens)
     if bonus > 0:
         response += "Taking {} due to bonus di(c)e\n".format(tens_result)
     if penalty > 0:
         response += "Taking {} due to penalty di(c)e\n".format(tens_result)
-    ones_result = roll_helper(10)
     response += "Ones: {}\n".format(ones_result)
 
     result = 100 if tens_result == 0 and ones_result == 0 else 10 * tens_result + ones_result
