@@ -53,8 +53,7 @@ def get_sucess_info(result, threshold):
 
     return success_str, success_colour
 
-# remove hardcoded test server
-@bot.slash_command(guild_ids=[828850110833885224], description="Roll a d100 and compare to threshold (usually skill level)")
+@bot.slash_command(description="Roll a d100 and compare to threshold (usually skill level)")
 async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral: bool = False):
     response = ""
     if bonus < 0 or penalty < 0:
@@ -87,7 +86,7 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
     success_str, success_colour = get_sucess_info(result, threshold)
     await ctx.respond(embed = discord.Embed(title = success_str, description = response, colour = success_colour), ephemeral = ephemeral)
 
-@bot.slash_command(guild_ids=[828850110833885224], description="Roll dice (e.g. 1d6+5)")
+@bot.slash_command(description="Roll dice (e.g. 1d6+5)")
 async def roll(ctx, dice_str: str, ephemeral: bool = False):
     dice = dice_str.replace(" ", "").split("+")
     result = 0
