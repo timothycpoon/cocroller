@@ -55,7 +55,7 @@ def get_sucess_info(result, threshold):
 
 @bot.slash_command(description="Roll a d100 and compare to threshold (usually skill level)")
 async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral: bool = False):
-    response = ""
+    response = "Threshold: {}\n".format(threshold)
     if bonus < 0 or penalty < 0:
         await ctx.respond("Cannot have negative bonus or penalty dice")
         return
@@ -92,7 +92,7 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
 async def roll(ctx, dice_str: str, ephemeral: bool = False):
     dice = dice_str.replace(" ", "").split("+")
     result = 0
-    result_str = ""
+    result_str = dice_str + "\n"
 
     for d in dice:
         match = re.match(r'^([1-9][0-9]*)(?:d([1-9][0-9]*))?$', d)
