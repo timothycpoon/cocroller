@@ -92,7 +92,7 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
 async def roll(ctx, dice_str: str, ephemeral: bool = False):
     dice = dice_str.replace(" ", "").split("+")
     result = 0
-    result_str = dice_str + "\n"
+    result_str = ""
 
     for d in dice:
         match = re.match(r'^([1-9][0-9]*)(?:d([1-9][0-9]*))?$', d)
@@ -111,7 +111,7 @@ async def roll(ctx, dice_str: str, ephemeral: bool = False):
             result += sum(results)
 
     result_str += " = {}\n".format(result)
-    await ctx.respond(embed = discord.Embed(title = result, description = result_str), ephemeral = ephemeral)
+    await ctx.respond(embed = discord.Embed(title = result, description = dice_str + "\n" + result_str), ephemeral = ephemeral)
 
 
 bot.run(CLIENT_SECRET)
