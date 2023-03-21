@@ -86,6 +86,8 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
     result = 100 if tens_result == 0 and ones_result == 0 else 10 * tens_result + ones_result
     response += "Total: {}\n".format(result)
     success_str, success_colour = get_sucess_info(result, threshold)
+    if ephemeral:
+        await ctx.respond(embed = discord.Embed(title = "Secret roll..."))
     await ctx.respond(embed = discord.Embed(title = success_str, description = response, colour = success_colour), ephemeral = ephemeral)
 
 @bot.slash_command(description="Roll dice (e.g. 1d6+5)")
@@ -111,6 +113,8 @@ async def roll(ctx, dice_str: str, ephemeral: bool = False):
             result += sum(results)
 
     result_str += " = {}\n".format(result)
+    if ephemeral:
+        await ctx.respond(embed = discord.Embed(title = "Secret roll..."))
     await ctx.respond(embed = discord.Embed(title = result, description = dice_str + "\n" + result_str), ephemeral = ephemeral)
 
 
