@@ -66,6 +66,9 @@ def get_luck_str(result, threshold):
     if result > threshold / 5:
         luck_strs.append("Spend {} luck for extreme success!".format(int(result - threshold / 5)))
 
+    if len(luck_strs) == 0:
+        return ""
+
     return "\n[Using luck?]({} \"{}\")".format("https://cdn3.emoji.gg/emojis/2923_MikuDab.png", "\n".join(luck_strs))
 
 @bot.slash_command(description="Roll a d100 and compare to threshold (usually skill level)")
