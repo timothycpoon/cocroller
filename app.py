@@ -54,19 +54,19 @@ def get_sucess_info(result, threshold):
     return success_str, success_colour
 
 def get_luck_str(result, threshold):
-    luck_str = ""
+    luck_strs = []
     if result == 1 or result == 100:
         return ""
     if result >= 96:
-        luck_str += "Note: can only spend luck if not a fumble\n"
+        luck_strs.append("Note: can only spend luck if not a fumble")
     if result > threshold:
-        luck_str += "Spend {} luck for success!\n".format(result - threshold)
+        luck_strs.append("Spend {} luck for success!".format(result - threshold))
     if result > threshold / 2:
-        luck_str += "Spend {} luck for hard success!\n".format(result - threshold / 2)
+        luck_strs.append("Spend {} luck for hard success!".format(int(result - threshold / 2)))
     if result > threshold / 5:
-        luck_str += "Spend {} luck for extreme success!\n".format(result - threshold / 5)
+        luck_strs.append("Spend {} luck for extreme success!".format(int(result - threshold / 5)))
 
-    return "\n[Using luck?](# {})".format(luck_str)
+    return "\n[Using luck?]({} \"{}\")".format("https://cdn3.emoji.gg/emojis/2923_MikuDab.png", "\n".join(luck_strs))
 
 @bot.slash_command(description="Roll a d100 and compare to threshold (usually skill level)")
 async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral: bool = False):
