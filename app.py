@@ -53,6 +53,21 @@ def get_sucess_info(result, threshold):
 
     return success_str, success_colour
 
+def get_luck_str(result, threshold):
+    luck_str = ""
+    if result == 1 or result == 100:
+        return ""
+    if result >= 96:
+        luck_str += "Note: can only spend luck if not a fumble\n"
+    if result > threshold:
+        luck_str += "Spend {} luck for success!\n".format(result - threshold)
+    if result > threshold / 2:
+        luck_str += "Spend {} luck for hard success!\n".format(result - threshold / 2)
+    if result > threshold / 5:
+        luck_str += "Spend {} luck for extreme success!\n".format(result - threshold / 5)
+
+    return "\n[Using luck?](# {})".format(luck_str)
+
 @bot.slash_command(description="Roll a d100 and compare to threshold (usually skill level)")
 async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral: bool = False):
     response = "Threshold: {}\n".format(threshold)
@@ -86,9 +101,10 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
     result = 100 if tens_result == 0 and ones_result == 0 else 10 * tens_result + ones_result
     response += "Total: {}\n".format(result)
     success_str, success_colour = get_sucess_info(result, threshold)
+    luck_str = get_luck_str(result, threshold)
     if ephemeral:
         await ctx.respond(embed = discord.Embed(title = "Secret roll..."))
-    await ctx.respond(embed = discord.Embed(title = success_str, description = response, colour = success_colour), ephemeral = ephemeral)
+    await ctx.respond(embed = discord.Embed(title = success_str, description = response + luck_str, colour = success_colour), ephemeral = ephemeral)
 
 @bot.slash_command(description="Roll dice (e.g. 1d6+5)")
 async def roll(ctx, dice_str: str, ephemeral: bool = False):
