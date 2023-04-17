@@ -29,7 +29,7 @@ def get_sucess_info(result, threshold):
     success_colour = Colour.red()
 
     if result == 1:
-        success_str = "Crtical success!"
+        success_str = "Critical success!"
         success_colour = Colour.green()
     elif result == 100:
         success_str = "Fumbled!"
