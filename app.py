@@ -5,10 +5,13 @@ from dotenv import load_dotenv
 import os
 
 from bot import bot
+from db import db
 
-load_dotenv()
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-CONNECTION_STRING = os.getenv('CONNECTION_STRING')
 
 if __name__ == '__main__':
+    load_dotenv()
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+    CONNECTION_STRING = os.getenv('CONNECTION_STRING')
+    
+    db.initialize(CONNECTION_STRING)
     bot.run(CLIENT_SECRET)

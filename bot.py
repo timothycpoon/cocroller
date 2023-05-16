@@ -4,7 +4,8 @@ from discord import Colour
 import random
 import re
 
-from bot_interpreter import get_success_info, get_luck_str
+from constants import Success
+from user import User
 
 bot = discord.Bot()
 
@@ -17,6 +18,49 @@ async def on_ready():
 
 async def send_error(msg):
     return ctx.respond(embed = discord.Embed(description = msg, colour = Colour.red()))
+
+def get_success_info(result, threshold):
+    success_str = "Failure :("
+    success_colour = Colour.red()
+
+    if result == 1:
+        success_str = Success.CRITICAL
+        success_colour = Colour.green()
+    elif result == 100:
+        success_str = Success.FUMBLED
+        success_colour = Colour.red()
+    elif result >= 96 and threshold < 50:
+        success_str = Success.FUMBLED
+        success_colour = Colour.red()
+    elif result <= threshold / 5:
+        success_str = Success.EXTREME
+        success_colour = Colour.green()
+    elif result <= threshold / 2:
+        success_str = Success.HARD
+        success_colour = Colour.green()
+    elif result <= threshold:
+        success_str = Success.NORMAL
+        success_colour = Colour.green()
+
+    return success_str, success_colour
+
+def get_luck_str(result, threshold):
+    luck_strs = []
+    if result == 1 or result == 100:
+        return ""
+    if result >= 96:
+        luck_strs.append("Note: can only spend luck if not a fumble")
+    if result > threshold:
+        luck_strs.append("Spend {} luck for success!".format(result - threshold))
+    if result > threshold / 2:
+        luck_strs.append("Spend {} luck for hard success!".format(int(result - threshold / 2)))
+    if result > threshold / 5:
+        luck_strs.append("Spend {} luck for extreme success!".format(int(result - threshold / 5)))
+
+    if len(luck_strs) == 0:
+        return ""
+
+    return "\n[Using luck?]({} \"{}\")".format("https://cdn3.emoji.gg/emojis/2923_MikuDab.png", "\n".join(luck_strs))
 
 @bot.slash_command(description="Roll a d100 and compare to threshold (usually skill level)")
 async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral: bool = False):
@@ -56,6 +100,16 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
     if ephemeral:
         await ctx.respond(embed = discord.Embed(title = "Secret roll..."))
     await ctx.respond(embed = discord.Embed(title = success_str, description = response + luck_str, colour = success_colour), ephemeral = ephemeral)
+
+    if success_str == Success.CRITICAL:
+        user = User(ctx.author.id)
+        user.increment_crit_count()
+        user.save()
+
+    if success_str == Success.FUMBLED:
+        user = User(ctx.author.id)
+        user.increment_fumble_count()
+        user.save()
 
 @bot.slash_command(description="Roll dice (e.g. 1d6+5)")
 async def roll(ctx, dice_str: str, ephemeral: bool = False):
