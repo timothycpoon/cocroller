@@ -109,6 +109,8 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
     if success_str == Success.FUMBLED:
         user = User(ctx.author.id)
         user.increment_fumble_count()
+        if result = 100:
+            user.increment_nat_100_count()
         user.save()
 
 @bot.slash_command(description="Roll dice (e.g. 1d6+5)")

@@ -6,6 +6,7 @@ class User(Doc):
         self.user_id = user_id
         self.fumbles = 0
         self.crits = 0
+        self.nat100s = 0
         self.load(db.collection(self.collection).find_one(self.primary_fil()))
 
     def primary_fil(self):
@@ -16,3 +17,6 @@ class User(Doc):
 
     def increment_crit_count(self):
         self.crits += 1
+
+    def increment_nat_100_count(self):
+        self.nat100s += 1
