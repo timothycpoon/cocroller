@@ -1,6 +1,4 @@
-from enum import StrEnum
-
-class Success(StrEnum):
+class Success:
     CRITICAL = "Critical success!"
     FUMBLED = "Fumbled!"
     EXTREME = "Extreme success!"
