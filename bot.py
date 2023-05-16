@@ -5,6 +5,7 @@ import random
 import re
 
 from constants import Success
+from db import db
 from user import User
 
 bot = discord.Bot()
@@ -139,3 +140,30 @@ async def roll(ctx, dice_str: str, ephemeral: bool = False):
     if ephemeral:
         await ctx.respond(embed = discord.Embed(title = "Secret roll..."))
     await ctx.respond(embed = discord.Embed(title = result, description = dice_str + "\n" + result_str), ephemeral = ephemeral)
+
+@bot.slash_command(description="Show leaderboard of nat 100s")
+async def leaderboard_nat100(ctx):
+    user_list = db.collection("users").find({}).sort('nat100s', -1)
+    description = '\n'.join(["<@{}>: {}".format(user.get('user_id'), user.get('nat100s'))
+                             for user in user_list if user.get('nat100s')])
+
+    await ctx.respond(embed = discord.Embed(title = "Leaderboard of Nat 100s <:nat100:1107895321314476063>",
+                                            description = description))
+
+@bot.slash_command(description="Show leaderboard of fumbles")
+async def leaderboard_fumble(ctx):
+    user_list = db.collection("users").find({}).sort('fumbles', -1)
+    description = '\n'.join(["<@{}>: {}".format(user.get('user_id'), user.get('fumbles'))
+                             for user in user_list if user.get('fumbles')])
+
+    await ctx.respond(embed = discord.Embed(title = "Leaderboard of Fumbles",
+                                            description = description))
+
+@bot.slash_command(description="Show leaderboard of crits")
+async def leaderboard_crit(ctx):
+    user_list = db.collection("users").find({}).sort('crits', -1)
+    description = '\n'.join(["<@{}>: {}".format(user.get('user_id'), user.get('crits'))
+                             for user in user_list if user.get('crits')])
+
+    await ctx.respond(embed = discord.Embed(title = "Leaderboard of Crits",
+                                            description = description))
