@@ -34,13 +34,9 @@ def get_sucess_info(result, threshold):
     elif result == 100:
         success_str = "Fumbled!"
         success_colour = Colour.red()
-    elif result >= 96:
-        success_str = "Fumbled if success chance < 50%, otherwise "
+    elif result >= 96 and threshold < 50:
+        success_str = "Fumbled!"
         success_colour = Colour.red()
-        if result <= threshold:
-            success_str += "success"
-        else:
-            success_str += "normal failure"
     elif result <= threshold / 5:
         success_str = "Extreme success!"
         success_colour = Colour.green()
