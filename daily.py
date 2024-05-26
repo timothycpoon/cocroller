@@ -27,8 +27,7 @@ class DailyCog(commands.Cog):
         td = event.start_time - datetime.now(timezone.utc)
         hours = int(td.seconds / 60 / 60)
         if td.days == 0 and hours == 8:
-            await channel.send("<@&1085319290980409454> Next JERP session is <t:{}:R>!".format(int(time.mktime(event.start_time.timetuple()))))
-        print("ASDFASDF\n\n")
+            await channel.send("<@&1085319290980409454> Next JERP session is <t:{}:R>!".format(int(event.start_time.timestamp())))
 
     @send_reminder.before_loop
     async def before_printer(self):
