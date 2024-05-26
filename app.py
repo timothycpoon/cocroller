@@ -6,6 +6,7 @@ import os
 
 from bot import bot
 from db import db
+from daily import DailyCog
 
 
 if __name__ == '__main__':
@@ -14,4 +15,5 @@ if __name__ == '__main__':
     CONNECTION_STRING = os.getenv('CONNECTION_STRING')
     
     db.initialize(CONNECTION_STRING)
+    bot.add_cog(DailyCog(bot))
     bot.run(CLIENT_SECRET)
