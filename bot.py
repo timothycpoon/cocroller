@@ -1,6 +1,7 @@
 import discord
 from discord import Colour
 
+import asyncio
 import random
 import re
 
@@ -17,8 +18,8 @@ def roll_helper(die):
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
-async def send_error(msg):
-    return ctx.respond(embed = discord.Embed(description = msg, colour = Colour.red()))
+async def send_error(ctx, msg):
+    await ctx.respond(embed = discord.Embed(description = msg, colour = Colour.red()), ephemeral=True)
 
 def get_success_info(result, threshold):
     success_str = "Failure :("
@@ -116,27 +117,7 @@ async def r100(ctx, threshold: int, bonus: int = 0, penalty: int = 0, ephemeral:
 
 @bot.slash_command(description="Roll dice (e.g. 1d6+5)")
 async def roll(ctx, dice_str: str, ephemeral: bool = False):
-    dice = dice_str.replace(" ", "").split("+")
-    result = 0
-    result_str = ""
-
-    for d in dice:
-        match = re.match(r'^([1-9][0-9]*)(?:d([1-9][0-9]*))?$', d)
-        if not match:
-            await send_error("Dice rolls should be in the form of (#dice)d(size of dice), adjoined by a '+'. For example, 1d6 rolls a single 6-sided die")
-            return
-        if match.lastindex == 1:
-            result += int(match[1])
-            result_str += "{}{}".format(" + " if result_str else "", match[1])
-        elif match.lastindex == 2:
-            num = int(match[1])
-            size = int(match[2])
-            results = [roll_helper(size) + 1 for _ in range(num)]
-            for r in results:
-                result_str += "{}{}".format(" + " if result_str else "", r)
-            result += sum(results)
-
-    result_str += " = {}\n".format(result)
+    result_str, result = await roll_dice(dice_str)
     if ephemeral:
         await ctx.respond(embed = discord.Embed(title = "Secret roll..."))
     await ctx.respond(embed = discord.Embed(title = result, description = dice_str + "\n" + result_str), ephemeral = ephemeral)
@@ -167,3 +148,44 @@ async def leaderboard_crit(ctx):
 
     await ctx.respond(embed = discord.Embed(title = "Leaderboard of Crits",
                                             description = description))
+
+@bot.slash_command(description="Do a fun little spell (DC 19)")
+async def teath(ctx):
+    if ctx.author.voice == None or ctx.author.voice.channel == None:
+        await send_error(ctx, "You must be connected to a voice channel")
+        return
+    channel = ctx.author.voice.channel
+    _, result = await roll_dice("1d20")
+    if result >= 19:
+        success_str = "Critical success!" if result == 20 else "Success!"
+        await asyncio.gather(*[member.move_to(None) for member in channel.members],
+            ctx.respond(embed = discord.Embed(title = result, description = success_str + " Everyone has killed themselves <:xdd:1234646976176455690>.")))
+    elif result <= 9:
+        await asyncio.gather(ctx.author.move_to(None),
+            ctx.respond(embed = discord.Embed(title = result, description = "Critical failure! You have killed yourself <:notthechilidog:1236533325607206982>")))
+    else:
+        await ctx.respond(embed = discord.Embed(title = result, description = "Failure. Nothing happens. <:zero:1175957176813113414>"))
+
+async def roll_dice(dice_str):
+    dice = dice_str.replace(" ", "").split("+")
+    result = 0
+    result_str = ""
+
+    for d in dice:
+        match = re.match(r'^([1-9][0-9]*)(?:d([1-9][0-9]*))?$', d)
+        if not match:
+            await send_error(ctx, "Dice rolls should be in the form of (#dice)d(size of dice), adjoined by a '+'. For example, 1d6 rolls a single 6-sided die")
+            return
+        if match.lastindex == 1:
+            result += int(match[1])
+            result_str += "{}{}".format(" + " if result_str else "", match[1])
+        elif match.lastindex == 2:
+            num = int(match[1])
+            size = int(match[2])
+            results = [roll_helper(size) + 1 for _ in range(num)]
+            for r in results:
+                result_str += "{}{}".format(" + " if result_str else "", r)
+            result += sum(results)
+
+    result_str += " = {}\n".format(result)
+    return (result_str, result)
